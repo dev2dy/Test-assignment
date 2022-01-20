@@ -16,9 +16,38 @@ public class Test {
 	// Global input scanner.
 	static final Scanner sc = new Scanner(System.in).useLocale(Locale.US);
 	
-	public static void Task1() {
+	// Upload a file
+	public static String Upload() {
+		
+		String input = null;
+		File file;
+		do {
+			System.out.print("\nEnter the file's absolute path with its extension! \nPath: ");
+			input = sc.next();
+			input = input.replace('\\', '/');
+			
+			file = new File(input);	
+			
+			if (input.charAt(0) == 'e') {
+				input = null;
+				break;
+			}
+			else if (!file.exists()) {
+				System.out.println("The file does not exist! Try again or enter 'e' to exit.");
+			}
+			
+			if (!input.contains(".srt")) {
+				System.out.println("It must be an .srt file! Make sure you included the extension!");
+			}
+			
+		} while (!file.exists());
+		
+		return input;
+	}
+	
+	public static void LongestDisplayed(String path) {
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("mandalorian.srt"));
+			BufferedReader br = new BufferedReader(new FileReader(path));
 			String str;
 			double duration = 0;
 			String from;
@@ -77,37 +106,45 @@ public class Test {
 		System.out.println("Displayed word for the longest amount of time: " + theWord);
 	}
 	
-	public static void Task2() {
+	public static void Observe() {
 		
 		// Input word with validation.
 		String input = null;
+		boolean exit = false;
 		do {
-			System.out.print("Enter a word: ");
-			input = sc.nextLine();
+			System.out.print("\nEnter a word or 'e' to exit: ");
+			input = sc.next();
+			if (input.charAt(0) == 'e' && input.length() == 1) {
+				System.out.println("Exit to main page.");
+				exit = true;
+				break;
+			}
 			if (!words.containsKey(input)) {
 				System.out.println("The file does not contain the given word! Please try again!");
 			}
 		} while (!words.containsKey(input));
 		
-		// Counting how many times has the input word occured.
-		int counter = 0;
-		for(String word : allWords){
-		    if(word.equals(input)) 
-		        counter++;
+		if (!exit) {
+			// Counting how many times has the input word occured.
+			int counter = 0;
+			for(String word : allWords){
+				if(word.equals(input)) 
+					counter++;
+			}
+			
+			DecimalFormat df = new DecimalFormat("0.000");
+			System.out.println("The given word occured " + counter + " time" + ((counter>1)?"s":"") + ", and displayed for " + df.format(words.get(input)) + " seconds.");			
 		}
-		
-		DecimalFormat df = new DecimalFormat("0.000");
-		System.out.println("The given word occured " + counter + " time" + ((counter>1)?"s":"") + ", and displayed for " + df.format(words.get(input)) + " seconds.");
 	}
 	
-	public static void Task3() {
+	public static void Shift(String path) {
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("mandalorian.srt"));
+			BufferedReader br = new BufferedReader(new FileReader(path));
 			String str;
 			
-			System.out.print("Enter file name: ");
+			System.out.print("\nEnter output file name: ");
 			String filename = null;
-			filename = sc.nextLine();
+			filename = sc.next();
 			BufferedWriter bw = new BufferedWriter(new FileWriter(filename + ".srt"));
 			
 			// In the first while loop, the input number being validated to be sure it cannot be shifted under 0.
@@ -143,7 +180,7 @@ public class Test {
 			br.close();
 			
 			// Second while loop writes the lines and changes the SRT times if needed.
-			br = new BufferedReader(new FileReader("mandalorian.srt"));
+			br = new BufferedReader(new FileReader(path));
 			str = null;
 			from = null;
 			String to = null;
@@ -198,12 +235,57 @@ public class Test {
 	}
 	
 	public static void main(String[] args) {
-		Task1();
+		//char[] options = {'e','u','w','s'};
+		char input = ' ';
+		boolean uploaded = false;
+		String path = null;
+		do {
+			if (uploaded) {
+				System.out.print("\nUPLOADED FILE: " + path.substring(path.lastIndexOf('/') + 1));
+			}
+			System.out.print("\nOptions: e=exit, u=upload, o=observe word, s=shift time. \nChoose an option: ");
+			
+			
+			try {
+				input = sc.next().charAt(0);
+			} catch (Exception e) {
+				System.out.println("Error occured.");
+			}
+			
+			if (input == 'u') {		
+				// Task1
+				path = Upload();
+				if (path != null) {
+					uploaded = true;	
+					words.clear();
+					allWords.clear();
+					LongestDisplayed(path);
+				}
+				else {
+					uploaded = false;
+				}
+			}
+			else if (input == 'o' && uploaded) {
+				// Task2
+				Observe();
+			}
+			else if (input == 's' && uploaded) {
+				// Task3
+				Shift(path);				
+			}
+			else if ((input == 'o' || input == 's') && !uploaded) {
+				System.out.println("Before observe or shift time, please upload an SRT file!");
+			}
+				
+		} while (input != 'e');
+		
 		//System.out.println(words);
 		//System.out.println(allWords);
-		Task2();
-		Task3();
 		sc.close();
+		System.out.println("Exit...");
+		
+		// E.G. PATH
+		// C:\Users\davos\git\Test-assignment\mandalorian.srt
 	}
 	
 }
