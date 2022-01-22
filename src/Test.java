@@ -114,6 +114,7 @@ public class Test {
 		do {
 			System.out.print("\nEnter a word or 'e' to exit: ");
 			input = sc.next();
+			input = input.toLowerCase();
 			if (input.charAt(0) == 'e' && input.length() == 1) {
 				System.out.println("Exit to main page.");
 				exit = true;
@@ -122,19 +123,20 @@ public class Test {
 			if (!words.containsKey(input)) {
 				System.out.println("The file does not contain the given word! Please try again!");
 			}
-		} while (!words.containsKey(input));
-		
-		if (!exit) {
-			// Counting how many times has the input word occured.
-			int counter = 0;
-			for(String word : allWords){
-				if(word.equals(input)) 
-					counter++;
+			else {
+				// Counting how many times has the input word occured.
+				int counter = 0;
+				for(String word : allWords){
+					if(word.equals(input)) 
+						counter++;
+				}
+				
+				DecimalFormat df = new DecimalFormat("0.000");
+				System.out.println("The given word occured " + counter + " time" + ((counter>1)?"s":"") + ", and displayed for " + df.format(words.get(input)) + " seconds.");				
 			}
 			
-			DecimalFormat df = new DecimalFormat("0.000");
-			System.out.println("The given word occured " + counter + " time" + ((counter>1)?"s":"") + ", and displayed for " + df.format(words.get(input)) + " seconds.");			
-		}
+		} while (/*!words.containsKey(input) &&*/ !exit);
+		
 	}
 	
 	public static void Shift(String path) {
@@ -245,9 +247,15 @@ public class Test {
 			}
 			System.out.print("\nOptions: e=exit, u=upload, o=observe word, s=shift time. \nChoose an option: ");
 			
-			
+			String curr = null;
 			try {
-				input = sc.next().charAt(0);
+				curr = sc.next();
+				if (curr.length() == 1) {					
+					input = curr.charAt(0);
+				}
+				else {
+					input = ' ';
+				}
 			} catch (Exception e) {
 				System.out.println("Error occured.");
 			}
@@ -276,7 +284,7 @@ public class Test {
 			else if ((input == 'o' || input == 's') && !uploaded) {
 				System.out.println("Before observe or shift time, please upload an SRT file!");
 			}
-				
+		
 		} while (input != 'e');
 		
 		//System.out.println(words);
